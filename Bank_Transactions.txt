@@ -1,0 +1,129 @@
+Consider the following schema:
+create database bank
+
+tables:
+users(id, name, email, account_no)
+accounts(id, account_no, balance)
+
+Queries:
+Insert some raw data and do the following queries using mysql transaction statement:
+i) userA is depositing 1000 Rs. his account
+
+ii) userA is withdrawing 500 Rs.
+
+iii) userA is transferring 200 Rs to userB's account
+
+mysql> Create temporary table Users_Accounts
+    -> Select Users.id as user_id, Accounts.id as account_id, Users.account_no, name, email, balance
+    -> from Users join Accounts
+    -> where Users.account_no = Accounts.account_no;
+Query OK, 5 rows affected (0.14 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> select * from Users_Accounts;
++---------+------------+------------+-------+-----------------+---------+
+| user_id | account_id | account_no | name  | email           | balance |
++---------+------------+------------+-------+-----------------+---------+
+|       1 |         10 |       1111 | UserA | userA@gmail.com |   34000 |
+|       2 |         11 |       2222 | UserB | userB@gmail.com |   23500 |
+|       3 |         12 |       3333 | UserC | userC@gmail.com |   73500 |
+|       4 |         13 |       4444 | UserD | userD@gmail.com |   89000 |
+|       5 |         14 |       5555 | UserE | userE@gmail.com |   90000 |
++---------+------------+------------+-------+-----------------+---------+
+5 rows in set (0.00 sec)
+
+mysql> Set autocommit = 0;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> Start Transaction;
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> Update Users_Accounts
+    -> Set balance = balance + 1000
+    -> where name = 'UserA';
+Query OK, 1 row affected (0.10 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> Commit;
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> Select * from Users_Accounts;
++---------+------------+------------+-------+-----------------+---------+
+| user_id | account_id | account_no | name  | email           | balance |
++---------+------------+------------+-------+-----------------+---------+
+|       1 |         10 |       1111 | UserA | userA@gmail.com |   35000 |
+|       2 |         11 |       2222 | UserB | userB@gmail.com |   23500 |
+|       3 |         12 |       3333 | UserC | userC@gmail.com |   73500 |
+|       4 |         13 |       4444 | UserD | userD@gmail.com |   89000 |
+|       5 |         14 |       5555 | UserE | userE@gmail.com |   90000 |
++---------+------------+------------+-------+-----------------+---------+
+5 rows in set (0.00 sec)
+
+mysql> Start Transaction;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> Update Users_Accounts
+    -> Set balance = balance - 500
+    -> where name = 'UserA';
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> Commit;
+Query OK, 0 rows affected (0.14 sec)
+
+mysql> Select * from Users_Accounts;
++---------+------------+------------+-------+-----------------+---------+
+| user_id | account_id | account_no | name  | email           | balance |
++---------+------------+------------+-------+-----------------+---------+
+|       1 |         10 |       1111 | UserA | userA@gmail.com |   34500 |
+|       2 |         11 |       2222 | UserB | userB@gmail.com |   23500 |
+|       3 |         12 |       3333 | UserC | userC@gmail.com |   73500 |
+|       4 |         13 |       4444 | UserD | userD@gmail.com |   89000 |
+|       5 |         14 |       5555 | UserE | userE@gmail.com |   90000 |
++---------+------------+------------+-------+-----------------+---------+
+5 rows in set (0.00 sec)
+
+mysql> Start Transaction;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> Update Users_Accounts
+    -> Set balance = balance - 200
+    -> where name = 'UserA';
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> Update Users_Accounts
+    -> Set balance = balance + 200
+    -> where name = 'UserB';
+Query OK, 1 row affected (0.00 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> Commit;
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> Select * from users_accounts;
++---------+------------+------------+-------+-----------------+---------+
+| user_id | account_id | account_no | name  | email           | balance |
++---------+------------+------------+-------+-----------------+---------+
+|       1 |         10 |       1111 | UserA | userA@gmail.com |   34300 |
+|       2 |         11 |       2222 | UserB | userB@gmail.com |   23700 |
+|       3 |         12 |       3333 | UserC | userC@gmail.com |   73500 |
+|       4 |         13 |       4444 | UserD | userD@gmail.com |   89000 |
+|       5 |         14 |       5555 | UserE | userE@gmail.com |   90000 |
++---------+------------+------------+-------+-----------------+---------+
+5 rows in set (0.00 sec)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
